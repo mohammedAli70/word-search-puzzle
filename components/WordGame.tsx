@@ -153,19 +153,35 @@ export default function WordGame() {
     clientX: number,
     clientY: number
   ): GridCell | null => {
-    if (!gridRef.current) return null;
+    if (!gridRef.current || letterGrid.length === 0) return null;
 
     const rect = gridRef.current.getBoundingClientRect();
+    
+    // Calculate position relative to the grid element
     const x = clientX - rect.left;
     const y = clientY - rect.top;
+
+    // Clamp coordinates to grid bounds
+    const clampedX = Math.max(0, Math.min(x, rect.width - 1));
+    const clampedY = Math.max(0, Math.min(y, rect.height - 1));
 
     const cellWidth = rect.width / GRID_SIZE;
     const cellHeight = rect.height / GRID_SIZE;
 
-    const col = Math.floor(x / cellWidth);
-    const row = Math.floor(y / cellHeight);
+    // Calculate raw column index (0 to GRID_SIZE-1)
+    const rawCol = Math.min(Math.floor(clampedX / cellWidth), GRID_SIZE - 1);
+    const row = Math.min(Math.floor(clampedY / cellHeight), GRID_SIZE - 1);
 
-    if (row >= 0 && row < GRID_SIZE && col >= 0 && col < GRID_SIZE) {
+    // Check if we're in RTL mode by checking the computed direction
+    const isRTL = window.getComputedStyle(gridRef.current).direction === 'rtl' ||
+                  document.documentElement.dir === 'rtl';
+    
+    // In RTL, invert the column index to match visual layout
+    // Column 0 in DOM is visually on the right, so we invert it
+    const col = isRTL ? (GRID_SIZE - 1 - rawCol) : rawCol;
+
+    // Ensure valid indices
+    if (row >= 0 && row < letterGrid.length && col >= 0 && col < letterGrid[row]?.length) {
       return letterGrid[row][col];
     }
 
@@ -214,17 +230,20 @@ export default function WordGame() {
 
   const handleTouchStart = (e: React.TouchEvent, cell: GridCell) => {
     if (isCorrect === true) return;
-    e.preventDefault(); // Prevent scrolling and other default behaviors
+    e.preventDefault();
+    e.stopPropagation();
     handleCellSelect(cell);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (isCorrect === true || !isDrawing) return;
-    e.preventDefault(); // Prevent scrolling while drawing
+    e.preventDefault();
+    e.stopPropagation();
 
-    const touch = e.touches[0];
+    // Use changedTouches for more reliable tracking during move
+    const touch = e.changedTouches?.[0] || e.touches?.[0];
     if (!touch) return;
-    
+
     const cell = getCellFromPosition(touch.clientX, touch.clientY);
     if (cell) {
       handleCellSelect(cell);
@@ -476,7 +495,8 @@ export default function WordGame() {
             style={{
               gridTemplateColumns: `repeat(${GRID_SIZE}, 1fr)`,
               aspectRatio: '1',
-              touchAction: 'none', // Prevent default touch behaviors like scrolling
+              touchAction: 'none',
+              userSelect: 'none',
             }}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
@@ -504,7 +524,9 @@ export default function WordGame() {
                             : 'bg-blue-400 text-blue-900 shadow-md scale-105'
                           : 'bg-white text-gray-800 hover:bg-blue-100'
                       }
-                      ${isCorrect === true ? 'cursor-not-allowed' : ''}
+                      ${
+                        isCorrect === true ? 'cursor-not-allowed' : 'touch-none'
+                      }
                     `}
                     onMouseDown={() => handleMouseDown(cell)}
                     onMouseEnter={() => handleMouseEnter(cell)}
@@ -514,6 +536,7 @@ export default function WordGame() {
                       WebkitUserSelect: 'none',
                       WebkitTouchCallout: 'none',
                       touchAction: 'none',
+                      WebkitTapHighlightColor: 'transparent',
                       position: 'relative',
                     }}
                   >

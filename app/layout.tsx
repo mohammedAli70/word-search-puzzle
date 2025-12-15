@@ -15,12 +15,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'لعبة البحث عن الكلمات - اليوم العالمي للغة العربية',
   description: 'لعبة تفاعلية للبحث عن الكلمات العربية',
-};
-
-export const viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 5,
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+  },
 };
 
 export default function RootLayout({
