@@ -212,14 +212,28 @@ export default function WordGame() {
     setIsDrawing(false);
   };
 
+  const handleTouchStart = (e: React.TouchEvent, cell: GridCell) => {
+    if (isCorrect === true) return;
+    e.preventDefault(); // Prevent scrolling and other default behaviors
+    handleCellSelect(cell);
+  };
+
   const handleTouchMove = (e: React.TouchEvent) => {
     if (isCorrect === true || !isDrawing) return;
+    e.preventDefault(); // Prevent scrolling while drawing
 
     const touch = e.touches[0];
+    if (!touch) return;
+    
     const cell = getCellFromPosition(touch.clientX, touch.clientY);
     if (cell) {
       handleCellSelect(cell);
     }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    e.preventDefault();
+    setIsDrawing(false);
   };
 
   // Get selected letters as string
@@ -290,8 +304,8 @@ export default function WordGame() {
 
   if (!currentQuestion) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
-        <div className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl p-8 md:p-12 text-center relative overflow-hidden">
+      <div className="flex flex-col items-center justify-center min-h-screen p-3 sm:p-4 bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
+        <div className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8 lg:p-12 text-center relative overflow-hidden">
           {/* Decorative background elements */}
           <div className="absolute top-0 left-0 w-full h-full opacity-5">
             <div className="absolute top-10 left-10 text-9xl">🎉</div>
@@ -302,10 +316,10 @@ export default function WordGame() {
 
           <div className="relative z-10">
             {/* Success Icon */}
-            <div className="mb-6 flex justify-center">
-              <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg animate-bounce">
+            <div className="mb-4 sm:mb-6 flex justify-center">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg animate-bounce">
                 <svg
-                  className="w-14 h-14 text-white"
+                  className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -321,59 +335,59 @@ export default function WordGame() {
             </div>
 
             {/* Main Title */}
-            <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 mb-4">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 mb-3 sm:mb-4">
               مبروك! 🎊
             </h1>
 
             {/* Subtitle */}
-            <p className="text-2xl md:text-3xl font-semibold text-gray-800 mb-3">
+            <p className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-800 mb-2 sm:mb-3">
               لقد أكملت جميع الأسئلة
             </p>
 
             {/* Description */}
-            <p className="text-lg text-gray-600 mb-8">
+            <p className="text-sm sm:text-base md:text-lg text-gray-600 mb-6 sm:mb-8">
               لقد أظهرت مهارة عالية في البحث عن الكلمات العربية
             </p>
 
             {/* Stats */}
-            <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-xl p-6 mb-8 border-2 border-blue-200">
-              <div className="flex justify-center items-center gap-8">
+            <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-xl p-4 sm:p-5 md:p-6 mb-6 sm:mb-8 border-2 border-blue-200">
+              <div className="flex justify-center items-center gap-4 sm:gap-6 md:gap-8">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-600">
+                  <div className="text-2xl sm:text-3xl font-bold text-blue-600">
                     {questions.length}
                   </div>
-                  <div className="text-sm text-gray-600 mt-1">سؤال</div>
+                  <div className="text-xs sm:text-sm text-gray-600 mt-1">سؤال</div>
                 </div>
-                <div className="w-px h-12 bg-gray-300"></div>
+                <div className="w-px h-8 sm:h-10 md:h-12 bg-gray-300"></div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-green-600">100%</div>
-                  <div className="text-sm text-gray-600 mt-1">مكتمل</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-green-600">100%</div>
+                  <div className="text-xs sm:text-sm text-gray-600 mt-1">مكتمل</div>
                 </div>
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
               <button
                 onClick={() => {
                   resetGameState();
                   setCurrentQuestionIndex(0);
                 }}
-                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold text-lg cursor-pointer"
+                className="px-6 sm:px-7 md:px-8 py-3 sm:py-3.5 md:py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold text-sm sm:text-base md:text-lg cursor-pointer"
               >
                 🔄 إعادة اللعبة
               </button>
               <button
                 onClick={() => window.location.reload()}
-                className="px-8 py-4 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl hover:from-gray-700 hover:to-gray-800 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold text-lg cursor-pointer"
+                className="px-6 sm:px-7 md:px-8 py-3 sm:py-3.5 md:py-4 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl hover:from-gray-700 hover:to-gray-800 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold text-sm sm:text-base md:text-lg cursor-pointer"
               >
                 🏠 العودة للبداية
               </button>
             </div>
 
             {/* Celebration Message */}
-            <div className="mt-8 pt-6 border-t border-gray-200">
-              <p className="text-base text-gray-500 italic">
+            <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200">
+              <p className="text-xs sm:text-sm md:text-base text-gray-500 italic">
                 شكراً لك على مشاركتك في اليوم العالمي للغة العربية
               </p>
             </div>
@@ -384,23 +398,23 @@ export default function WordGame() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="w-full max-w-4xl bg-white rounded-lg shadow-xl p-6 md:p-8">
+    <div className="flex flex-col items-center justify-center min-h-screen p-2 sm:p-4 bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="w-full max-w-4xl bg-white rounded-lg shadow-xl p-3 sm:p-4 md:p-6 lg:p-8">
         {/* Header */}
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-blue-800 mb-2">
+        <div className="text-center mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-800 mb-1 sm:mb-2">
             لعبة البحث عن الكلمات
           </h1>
-          <p className="text-lg text-gray-600">اليوم العالمي للغة العربية</p>
+          <p className="text-sm sm:text-base md:text-lg text-gray-600">اليوم العالمي للغة العربية</p>
         </div>
 
         {/* Progress */}
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-xs sm:text-sm font-medium text-gray-700">
               السؤال {currentQuestionIndex + 1} من {questions.length}
             </span>
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-xs sm:text-sm font-medium text-gray-700">
               {currentQuestion.direction === 'horizontal' ? 'أفقي' : 'عمودي'}
             </span>
           </div>
@@ -417,23 +431,23 @@ export default function WordGame() {
         </div>
 
         {/* Question */}
-        <div className="bg-blue-50 rounded-lg p-6 mb-6 border-r-4 border-blue-600">
-          <p className="text-xl font-semibold text-gray-800 text-right leading-relaxed">
+        <div className="bg-blue-50 rounded-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 border-r-4 border-blue-600">
+          <p className="text-base sm:text-lg md:text-xl font-semibold text-gray-800 text-right leading-relaxed">
             {currentQuestion.definition}
           </p>
         </div>
 
         {/* Selected Word Display */}
-        <div className="mb-6">
-          <div className="relative min-h-[100px] p-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-200 shadow-inner flex items-center justify-center">
+        <div className="mb-4 sm:mb-6">
+          <div className="relative min-h-[60px] sm:min-h-[80px] md:min-h-[100px] p-3 sm:p-4 md:p-6 lg:p-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-200 shadow-inner flex items-center justify-center">
             {selectedPath.length === 0 ? (
-              <p className="text-gray-400 text-center text-xl">
+              <p className="text-gray-400 text-center text-sm sm:text-base md:text-xl">
                 ارسم الكلمة في الشبكة أدناه
               </p>
             ) : (
               <div className="relative text-center" dir="rtl">
                 <span
-                  className={`text-5xl md:text-6xl font-bold inline-block ${
+                  className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold inline-block ${
                     isCorrect === true ? 'text-green-600' : 'text-blue-800'
                   }`}
                   style={{
@@ -452,21 +466,23 @@ export default function WordGame() {
         </div>
 
         {/* Letter Grid */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold text-gray-700 mb-3 text-right">
+        <div className="mb-4 sm:mb-6">
+          <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-700 mb-2 sm:mb-3 text-right">
             ارسم الكلمة في الشبكة:
           </h3>
           <div
             ref={gridRef}
-            className="grid gap-1 bg-blue-100 p-2 rounded-lg select-none"
+            className="grid gap-0.5 sm:gap-1 bg-blue-100 p-1 sm:p-2 rounded-lg select-none"
             style={{
               gridTemplateColumns: `repeat(${GRID_SIZE}, 1fr)`,
               aspectRatio: '1',
+              touchAction: 'none', // Prevent default touch behaviors like scrolling
             }}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
-            onTouchEnd={handleMouseUp}
+            onTouchEnd={handleTouchEnd}
             onTouchMove={handleTouchMove}
+            onTouchCancel={handleTouchEnd}
           >
             {letterGrid.map((row) =>
               row.map((cell) => {
@@ -479,7 +495,7 @@ export default function WordGame() {
                     key={cell.id}
                     className={`
                       aspect-square flex items-center justify-center
-                      text-2xl md:text-3xl font-bold
+                      text-base sm:text-lg md:text-2xl lg:text-3xl font-bold
                       rounded transition-all cursor-pointer
                       ${
                         selected
@@ -488,15 +504,16 @@ export default function WordGame() {
                             : 'bg-blue-400 text-blue-900 shadow-md scale-105'
                           : 'bg-white text-gray-800 hover:bg-blue-100'
                       }
-                      ${
-                        isCorrect === true ? 'cursor-not-allowed' : 'touch-none'
-                      }
+                      ${isCorrect === true ? 'cursor-not-allowed' : ''}
                     `}
                     onMouseDown={() => handleMouseDown(cell)}
                     onMouseEnter={() => handleMouseEnter(cell)}
+                    onTouchStart={(e) => handleTouchStart(e, cell)}
                     style={{
                       userSelect: 'none',
                       WebkitUserSelect: 'none',
+                      WebkitTouchCallout: 'none',
+                      touchAction: 'none',
                       position: 'relative',
                     }}
                   >
@@ -512,7 +529,7 @@ export default function WordGame() {
               })
             )}
           </div>
-          <p className="text-sm text-gray-500 text-center mt-2">
+          <p className="text-xs sm:text-sm text-gray-500 text-center mt-1 sm:mt-2">
             اضغط واسحب على الحروف لرسم الكلمة
           </p>
         </div>
@@ -520,7 +537,7 @@ export default function WordGame() {
         {/* Message */}
         {message && (
           <div
-            className={`mb-4 p-4 rounded-lg text-center text-lg font-semibold ${
+            className={`mb-3 sm:mb-4 p-3 sm:p-4 rounded-lg text-center text-sm sm:text-base md:text-lg font-semibold ${
               isCorrect === true
                 ? 'bg-green-100 text-green-800'
                 : isCorrect === false
@@ -533,25 +550,25 @@ export default function WordGame() {
         )}
 
         {/* Action Buttons */}
-        <div className="flex gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 justify-center">
           <button
             onClick={handleClear}
             disabled={selectedPath.length === 0 || isCorrect === true}
-            className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            className="px-4 sm:px-5 md:px-6 py-2.5 sm:py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors cursor-pointer text-sm sm:text-base font-medium"
           >
             مسح
           </button>
           <button
             onClick={handleCheckAnswer}
             disabled={selectedPath.length === 0 || isCorrect === true}
-            className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-semibold cursor-pointer"
+            className="px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-semibold cursor-pointer text-sm sm:text-base"
           >
             التحقق من الإجابة
           </button>
           {isCorrect === true && !isLastQuestion && (
             <button
               onClick={handleNextQuestion}
-              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold cursor-pointer"
+              className="px-4 sm:px-5 md:px-6 py-2.5 sm:py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold cursor-pointer text-sm sm:text-base"
             >
               السؤال التالي →
             </button>
